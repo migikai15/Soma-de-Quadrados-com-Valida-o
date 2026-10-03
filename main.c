@@ -23,7 +23,6 @@ int main(int argc, char *argv[]) {
     int *global = NULL;
     int *local = malloc(chunk * sizeof(int));
 
-    /* Root cria o vetor 1..N */
     if (rank == 0) {
         global = malloc(N * sizeof(int));
         for (int i = 0; i < N; i++)
@@ -50,18 +49,15 @@ int main(int argc, char *argv[]) {
     printf("Processo %d: soma local dos quadrados = %lld\n", rank, soma_local);
     fflush(stdout);
 
-    /* Reduz as somas locais no root */
     long long soma_paralela = 0;
     MPI_Reduce(&soma_local, &soma_paralela, 1, MPI_LONG_LONG,
                MPI_SUM, 0, MPI_COMM_WORLD);
 
     if (rank == 0) {
-        /* Soma sequencial */
         long long soma_seq = 0;
         for (int i = 1; i <= N; i++)
             soma_seq += (long long)i * i;
-
-        /* Fórmula fechada */
+        
         long long formula = (long long)N * (N + 1) * (2 * N + 1) / 6;
 
         printf("\nProcesso 0: soma paralela dos quadrados = %lld\n", soma_paralela);
